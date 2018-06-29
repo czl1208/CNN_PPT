@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
@@ -63,20 +62,21 @@ def _file_to_word_ids(filename, word_to_id):
   for line in data:
       mx = max(len(line), mx)
   data = [line for line in data if len(line) > 0]
+  print(mx)
   for line in data:
       num = line[len(line) - 1]
       line.pop(len(line) - 1)
-      line.pop(len(line) - 1)
-      while len(line) < 49:
+      while len(line) < 225:
           line.insert(0, 0)
       line.extend([num])
+  print(color_dict)
   return data, color_dict
 
 
 def read_raw_data():
 
-  train_path = os.path.join("/Users/caozhongli/simple-examples/data/", "pptx.train.txt")
-  #train_path = os.path.join("", "processed_ppt.dat")
+  #train_path = os.path.join("/Users/caozhongli/simple-examples/data/", "pptx.train.txt")
+  train_path = os.path.join("", "processed_ppt.dat")
   #valid_path = os.path.join(data_path, "pptx.train.txt")
   #test_path = os.path.join(data_path, "pptx.train.txt")
 
@@ -86,10 +86,12 @@ def read_raw_data():
   #test_data, _ = _file_to_word_ids(test_path, word_to_id)
   #vocabulary = len(word_to_id)
   data = np.asarray(train_data)
+
   lenx, leny = data.shape
   x = data[:, 0 : leny -1]
   y = data[:, leny - 1 : leny]
   return x, y
 
-read_raw_data()
+x, y = read_raw_data()
 
+print(x.shape)

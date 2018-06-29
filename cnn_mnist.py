@@ -29,7 +29,7 @@ def cnn_model_fn(features, labels, mode):
   # Input Layer
   # Reshape X to 4-D tensor: [batch_size, width, height, channels]
   # MNIST images are 28x28 pixels, and have one color channel
-  input_layer = tf.reshape(features["x"], [-1, 7, 7, 1])
+  input_layer = tf.reshape(features["x"], [-1, 15, 15, 1])
   print(input_layer.shape)
   # Convolutional Layer #1
   # Computes 32 features using a 5x5 filter with ReLU activation.
@@ -47,7 +47,7 @@ def cnn_model_fn(features, labels, mode):
   # First max pooling layer with a 2x2 filter and stride of 2
   # Input Tensor Shape: [batch_size, 28, 28, 32]
   # Output Tensor Shape: [batch_size, 14, 14, 32]
-  #pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
+  pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
   #print(pool1.shape)
   # Convolutional Layer #2
   # Computes 64 features using a 5x5 filter.
@@ -55,7 +55,7 @@ def cnn_model_fn(features, labels, mode):
   # Input Tensor Shape: [batch_size, 7, 7, 32]
   # Output Tensor Shape: [batch_size, 7, 7, 64]
   conv2 = tf.layers.conv2d(
-      inputs=conv1,
+      inputs=pool1,
       filters=64,
       kernel_size=[7, 7],
       padding="same",
@@ -65,13 +65,13 @@ def cnn_model_fn(features, labels, mode):
   # Second max pooling layer with a 2x2 filter and stride of 2
   # Input Tensor Shape: [batch_size, 14, 14, 64]
   # Output Tensor Shape: [batch_size, 7, 7, 64]
-  pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[1, 1], strides=2)
+  pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
   print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<1")
   print(pool2.shape)
   # Flatten tensor into a batch of vectors
   # Input Tensor Shape: [batch_size, 7, 7, 64]
   # Output Tensor Shape: [batch_size, 7 * 7 * 64]
-  pool2_flat = tf.reshape(pool2, [-1, 4 * 4 * 64])
+  pool2_flat = tf.reshape(pool2, [-1, 3 * 3 * 64])
 
   # Dense Layer
   # Densely connected layer with 1024 neurons
@@ -151,7 +151,7 @@ def main(unused_argv):
   train_input_fn = tf.estimator.inputs.numpy_input_fn(
       x={"x": train_data},
       y=train_labels,
-      batch_size=35,
+      batch_size=177,
       num_epochs=None,
       shuffle=True)
   mnist_classifier.train(
@@ -160,16 +160,21 @@ def main(unused_argv):
       hooks=[logging_hook])
   print("Comming back")
   # Evaluate the model and print results
-  
+
   pred_input_fn = tf.estimator.inputs.numpy_input_fn(
       x={"x": pred_data},
       y=pred_labels,
       num_epochs=1,
       shuffle=False)
   pred_results = mnist_classifier.predict(input_fn=pred_input_fn)
-  print(train_labels)
-  for result in pred_results:
-    print(result['classes'])  
+  result_labels = [result['classes'] for result in pred_results]
+  err = 0
+  for i in range(len(result_labels)):
+    if result_labels[i] != pred_labels[i]:
+      err = err + 1
+  print(err / len(result_labels))
+  #for result in pred_results:
+  #  print(result['classes'])
 
 if __name__ == "__main__":
   tf.app.run()
