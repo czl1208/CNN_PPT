@@ -90,8 +90,8 @@ def read_raw_data():
   lenx, leny = data.shape
   x = data[:, 0 : leny -1]
   y = data[:, leny - 1 : leny]
-  return x, y
+  return x, y, len(color_dict)
 
-x, y = read_raw_data()
+x, y, _ = read_raw_data()
 
 print(x.shape)
