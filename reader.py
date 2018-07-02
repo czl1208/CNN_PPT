@@ -6,7 +6,7 @@ import os
 import sys
 import numpy as np
 import tensorflow as tf
-
+import math
 Py3 = sys.version_info[0] == 3
 
 def _read_words(filename):
@@ -63,10 +63,13 @@ def _file_to_word_ids(filename, word_to_id):
       mx = max(len(line), mx)
   data = [line for line in data if len(line) > 0]
   print(mx)
+  l = int(math.sqrt(mx))
+  if l * l < mx:
+    l = l + 1 
   for line in data:
       num = line[len(line) - 1]
       line.pop(len(line) - 1)
-      while len(line) < 225:
+      while len(line) < l * l:
           line.insert(0, 0)
       line.extend([num])
   print(color_dict)
@@ -86,7 +89,7 @@ def read_raw_data():
   #test_data, _ = _file_to_word_ids(test_path, word_to_id)
   #vocabulary = len(word_to_id)
   data = np.asarray(train_data)
-
+  print(data.shape)
   lenx, leny = data.shape
   x = data[:, 0 : leny -1]
   y = data[:, leny - 1 : leny]
