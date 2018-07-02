@@ -17,7 +17,7 @@ def _read_words(filename):
       return f.read().decode("utf-8").replace("\n", " ").split()
 
 def id_to_word(arr):
-  filename='/Users/caozhongli/simple-examples/data/pptx.train.txt'
+  filename='C:\\Users\\t-tazha\\CNN_PPT\\microsoftPPTX.txt'
   data = _read_words(filename)
 
   counter = collections.Counter(data)

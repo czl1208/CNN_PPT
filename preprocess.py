@@ -14,8 +14,8 @@ def removeSymbols(sentence):
 	sentence = ' '.join(sentence.split())
 	return sentence
 
-ppt = open("microsoftPPTX.txt", "r")
-processed = open("processed_ppt.dat", "w")
+ppt = open("microsoftPPTX.txt", "r", encoding = 'utf-8')
+processed = open("processed_ppt.dat", "w", encoding = 'utf-8')
 text = ppt.readlines()
 print(text)
 for line in text:
