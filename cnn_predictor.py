@@ -29,11 +29,8 @@ CLASS_NUM = class_num
 lenx, leny = data.shape
 LAYER_SHAPE_X = int(math.sqrt(leny))
 LAYER_SHAPE_Y = int(math.sqrt(leny))
-TRAIN_DATA = data[0 : lenx - 20, :]
-TRAIN_LABELS = labels[0 : lenx - 20, :]
-#train_labels = reader.readtrainlabel("train")
-PRED_DATA = data[lenx - 20 : lenx, :]
-PRED_LABELS = labels[lenx - 20 : lenx, :]  # Returns np.array
+PRED_DATA = data
+PRED_LABELS = labels  # Returns np.array
 #print(train_data.shape)
 
 
@@ -135,51 +132,38 @@ def cnn_model_fn(features, labels, mode):
 
 
 def main(unused_argv):
-  # Load training and eval data
-  #mnist = tf.contrib.learn.datasets.load_dataset("mnist")
-  # data, labels, class_num = reader.read_raw_data()  # Returns np.array
-  # CLASS_NUM = class_num
-  # lenx, leny = data.shape
-  # LAYER_SHAPE_X = int(math.sqrt(leny))
-  # LAYER_SHAPE_Y = int(math.sqrt(leny))
-  # train_data = data[0 : lenx - 20, :]
-  # train_labels = labels[0 : lenx - 20, :]
-  # #train_labels = reader.readtrainlabel("train")
-  # pred_data = data[lenx - 20 : lenx, :]
-  # pred_labels = labels[lenx - 20 : lenx, :]  # Returns np.array
-  # print(train_data.shape)
-  train_data = TRAIN_DATA
-  train_labels = TRAIN_LABELS
+  # train_data = TRAIN_DATA
+  # train_labels = TRAIN_LABELS
   pred_data = PRED_DATA
   pred_labels = PRED_LABELS
-  train_data=train_data.astype('float32')
+  # train_data=train_data.astype('float32')
   pred_data=pred_data.astype('float32')
   #train_labels=train_labels.astype('float32')
   # Create the Estimator
   mnist_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn)
+      model_fn=cnn_model_fn, model_dir='/var/folders/_x/47zvp5js3gb6gyhj9f93gwr40000gn/T/tmpskqv1e8k')
 
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
-  tensors_to_log = {"probabilities": "softmax_tensor"}
-  tf.summary.merge_all()
-  #summary_hook = tf.train.SummarySaverHook(
-  #  save_steps=10, output_dir = "./summary/", summary_op='summary')
-  logging_hook = tf.train.LoggingTensorHook(
-      tensors=tensors_to_log, every_n_iter=50)
+  # tensors_to_log = {"probabilities": "softmax_tensor"}
+  # tf.summary.merge_all()
+  # #summary_hook = tf.train.SummarySaverHook(
+  # #  save_steps=10, output_dir = "./summary/", summary_op='summary')
+  # logging_hook = tf.train.LoggingTensorHook(
+  #     tensors=tensors_to_log, every_n_iter=50)
 
-  # Train the model
-  train_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": train_data},
-      y=train_labels,
-      batch_size=lenx - 20,
-      num_epochs=None,
-      shuffle=True)
-  mnist_classifier.train(
-      input_fn=train_input_fn,
-      steps=20000,
-      hooks=[logging_hook])
-  print("Comming back")
+  # # Train the model
+  # train_input_fn = tf.estimator.inputs.numpy_input_fn(
+  #     x={"x": train_data},
+  #     y=train_labels,
+  #     batch_size=lenx - 20,
+  #     num_epochs=None,
+  #     shuffle=True)
+  # mnist_classifier.train(
+  #     input_fn=train_input_fn,
+  #     steps=20000,
+  #     hooks=[logging_hook])
+  # print("Comming back")
   # Evaluate the model and print results
 
   pred_input_fn = tf.estimator.inputs.numpy_input_fn(
@@ -189,11 +173,13 @@ def main(unused_argv):
       shuffle=False)
   pred_results = mnist_classifier.predict(input_fn=pred_input_fn)
   result_labels = [result['classes'] for result in pred_results]
+  result_probabilities = [result['probabilities'] for result in pred_results]
   err = 0
   for i in range(len(result_labels)):
     if result_labels[i] != pred_labels[i]:
       err = err + 1
   print(err / len(result_labels))
+  print(result_probabilities)
   #for result in pred_results:
   #  print(result['classes'])
 
