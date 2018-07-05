@@ -65,7 +65,7 @@ def _file_to_word_ids(filename, word_to_id):
   print(mx)
   l = int(math.sqrt(mx))
   if l * l < mx:
-    l = l + 1 
+    l = l + 1
   for line in data:
       num = line[len(line) - 1]
       line.pop(len(line) - 1)
@@ -73,26 +73,24 @@ def _file_to_word_ids(filename, word_to_id):
           line.insert(0, 0)
       line.extend([num])
   print(color_dict)
+
   return data, color_dict
 
 
 def read_raw_data():
 
-  #train_path = os.path.join("/Users/caozhongli/simple-examples/data/", "pptx.train.txt")
   train_path = os.path.join("", "processed_ppt.dat")
-  #valid_path = os.path.join(data_path, "pptx.train.txt")
-  #test_path = os.path.join(data_path, "pptx.train.txt")
-
   word_to_id = _build_vocab(train_path)
   train_data, color_dict = _file_to_word_ids(train_path, word_to_id)
-  #valid_data, _ = _file_to_word_ids(valid_path, word_to_id)
-  #test_data, _ = _file_to_word_ids(test_path, word_to_id)
-  #vocabulary = len(word_to_id)
   data = np.asarray(train_data)
   print(data.shape)
   lenx, leny = data.shape
   x = data[:, 0 : leny -1]
   y = data[:, leny - 1 : leny]
+  colors = open("../color_dict.dat", "w", encoding = 'utf-8')
+  for color in color_dict:
+    colors.write(color + "\n")
+  colors.close()
   return x, y, len(color_dict)
 
 x, y, _ = read_raw_data()

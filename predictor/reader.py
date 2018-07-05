@@ -65,11 +65,11 @@ def _file_to_word_ids(filename, word_to_id):
   print(mx)
   l = int(math.sqrt(mx))
   if l * l < mx:
-    l = l + 1 
+    l = l + 1
   for line in data:
       num = line[len(line) - 1]
       line.pop(len(line) - 1)
-      while len(line) < l * l:
+      while len(line) < 225:
           line.insert(0, 0)
       line.extend([num])
   print(color_dict)
@@ -94,6 +94,11 @@ def read_raw_data():
   x = data[:, 0 : leny -1]
   y = data[:, leny - 1 : leny]
   return x, y, len(color_dict)
+
+def get_color(color_id):
+  file = open("../color_dict.dat", 'r')
+  colors = [color for color in file.readlines()]
+  return colors[color_id]
 
 x, y, _ = read_raw_data()
 

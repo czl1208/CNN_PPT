@@ -25,8 +25,8 @@ import math
 tf.logging.set_verbosity(tf.logging.INFO)
 
 data, labels, class_num = reader.read_raw_data()  # Returns np.array
-CLASS_NUM = class_num
-lenx, leny = data.shape
+CLASS_NUM = 7
+lenx, leny = 150, 225
 LAYER_SHAPE_X = int(math.sqrt(leny))
 LAYER_SHAPE_Y = int(math.sqrt(leny))
 PRED_DATA = data
@@ -141,7 +141,7 @@ def main(unused_argv):
   #train_labels=train_labels.astype('float32')
   # Create the Estimator
   mnist_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir='/var/folders/_x/47zvp5js3gb6gyhj9f93gwr40000gn/T/tmpskqv1e8k')
+      model_fn=cnn_model_fn, model_dir='../trainer/model')
 
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
@@ -172,16 +172,30 @@ def main(unused_argv):
       num_epochs=1,
       shuffle=False)
   pred_results = mnist_classifier.predict(input_fn=pred_input_fn)
-  result_labels = [result['classes'] for result in pred_results]
-  result_probabilities = [result['probabilities'] for result in pred_results]
+  results = [result for result in pred_results]
+  result_labels = [result['classes'] for result in results]
+  result_probabilities = [result['probabilities'] for result in results]
   err = 0
   for i in range(len(result_labels)):
     if result_labels[i] != pred_labels[i]:
       err = err + 1
-  print(err / len(result_labels))
+  print("Color Probabilities:                         ")
   print(result_probabilities)
-  #for result in pred_results:
-  #  print(result['classes'])
+  print("Predict color:                               ")
+  for label in result_labels:
+    print(reader.get_color(label))
+  print("Correct rate:                                ")
+  print(1 - err / len(result_labels))
+  for probabilities in result_probabilities:
+    getRecommend(probabilities)
+
+def getRecommend(probabilities):
+    probs = [prob for prob in probabilities]
+    zipped = zip(probs, range(0, len(probs)))
+    zipped = sorted(zipped, key=lambda x: -x[0])
+    rec_color_seq = [reader.get_color(x[1]) for x in zipped]
+    print("Recommend color sequence:  ")
+    print(rec_color_seq)
 
 
 if __name__ == "__main__":

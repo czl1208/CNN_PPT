@@ -157,7 +157,7 @@ def main(unused_argv):
   #train_labels=train_labels.astype('float32')
   # Create the Estimator
   mnist_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn)
+      model_fn=cnn_model_fn, model_dir = './model')
 
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
@@ -177,7 +177,7 @@ def main(unused_argv):
       shuffle=True)
   mnist_classifier.train(
       input_fn=train_input_fn,
-      steps=20000,
+      steps=5000,
       hooks=[logging_hook])
   print("Comming back")
   # Evaluate the model and print results
